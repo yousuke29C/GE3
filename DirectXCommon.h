@@ -3,6 +3,7 @@
 #include <dxgi1_6.h>
 #include <wrl.h>
 #include <vector>
+#include <chrono>
 
 #include "WinApp.h"
 
@@ -11,6 +12,23 @@ class DirectXcommon
 public://メンバ関数
 	//初期化
 	void Initialize(WinApp* winApp);
+
+	/// <summary>
+	///描画前処理
+	/// </summary>
+	void PreDraw();
+
+	/// <summary>
+	///	描画後処理
+	/// </summary>
+	void PostDraw();
+
+	//デバイス取得
+	ID3D12Device* GetDevice() const { return device.Get(); }
+
+	//コマンドリスト取得
+	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+
 
 private:
 	/// <summary>
@@ -42,6 +60,16 @@ private:
 	/// </summary>
 	void InitializeFence();
 
+	/// <summary>
+	/// FPS固定初期化
+	/// </summary>
+	void InitializeFixFPS();
+
+	/// <summary>
+	///	FPS固定更新
+	/// </summary>
+	void UpdateFixFPS();
+
 private:
 	WinApp* winApp = nullptr;
 
@@ -68,5 +96,8 @@ private:
 
 	//フェンス
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
-};
+	UINT64 fenceVal = 0;
 
+	//記録時間(FPS固定用)
+	std::chrono::steady_clock::time_point reference_;
+};
